@@ -23,29 +23,57 @@ df['Valor Venda'].sum()
 
 # Custo Total
 df['Custo'] = df['Custo Unitário'].mul(df['Quantidade'])
-df.head()
 
 # Lucro Total
 df['Lucro'] = df['Valor Venda'] - df['Custo']
 
+"""
+
+---
+
+
+## Verificando prazos de entrega dos produtos de cada marca
+"""
+
 # Tempo de entrega
-df['Tempo de Entrega'] = df['Data Envio'] - df['Data Venda']
-df['Tempo de Entrega'].dtype
+df['Tempo de Entrega'] = df['Data Envio'] - df['Data Venda'] # retorna uma string com a diferença
 
-# convertendo em valor númerio
+# Convertendo os valores em números e verificando a diferença entre os dias
 df['Tempo de Entrega'] = (df['Data Envio'] - df['Data Venda']).dt.days
-df['Tempo de Entrega'].dtype
 
+# Tempo médio por marca
 df.groupby('Marca')['Tempo de Entrega'].mean()
+
+"""## Conclusão:
+O tempo médio de entrega por marca está equilibrado entre todas as marcas
+
+## Calculo Utilizado:
+O tempo médio de entrega é calculado da diferença entre a *Data de envio* e a *Data de Venda*
+
+---
+## Verificando o Lucro por ano e marca
+"""
 
 # Lucro por ano e marca
 df.groupby([df['Data Venda'].dt.year, 'Marca'])['Lucro'].sum()
 
+# Formatando os números para duas casas decimais
 pd.options.display.float_format = '{:20,.2f}'.format
 
 # Resetar o Index
 lucro_ano = df.groupby([df['Data Venda'].dt.year, 'Marca'])['Lucro'].sum().reset_index()
 lucro_ano
+
+"""## Conclusão:
+
+* A marca Fabrikam nos dois anos, 2008 e 2009, teve o maior lucro dentre as outras marcas, porém o lucro em 2009 foi menor que em 2008
+
+* A Adventure Works foi a segunda com maior lucro, seu lucro aumentou entre os períodos analisados
+
+* A Contoso teve o menor lucro das marcas, porém teve um grande aumento de lucro cerca de 145% entre 2008 e 2009
+
+---
+"""
 
 # Quantidade de produtos vendidos
 df.groupby('Produto')['Quantidade'].sum().sort_values(ascending=False)
@@ -54,3 +82,6 @@ df.groupby('Produto')['Quantidade'].sum().sort_values(ascending=False)
 df.groupby('Produto')['Quantidade'].sum().sort_values(ascending=False).plot.barh(title='Total Produtos Vendidos')
 plt.ylabel('Produto')
 plt.xlabel('Total');
+
+# Produtos mais vendidos com mais detalhes
+df.groupby(['Produto', 'Fabricante', 'Classe', 'Cor'])['Quantidade'].sum().sort_values(ascending=False)
